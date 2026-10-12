@@ -27,7 +27,8 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http
-            , AuthenticationSuccessHandler customAuthenticationSuccessHandler) throws Exception{
+            , AuthenticationSuccessHandler customAuthenticationSuccessHandler,
+            ExpenseTrackerOAuth2UserService oauth2UserService) throws Exception{
         http.authorizeHttpRequests(config ->
                 config
                         .requestMatchers("/css/**").permitAll()
@@ -36,6 +37,7 @@ public class SecurityConfig {
                         .requestMatchers("/").permitAll()
                         .requestMatchers("/showRegistrationForm").permitAll()
                         .requestMatchers("/processRegistration").permitAll()
+                        .requestMatchers("/forgot-password", "/password-reset", "/reset-password").permitAll()
                         .anyRequest().authenticated())
                 .formLogin(form ->
                         form
@@ -43,6 +45,10 @@ public class SecurityConfig {
                                 .loginProcessingUrl("/authenticateTheUser")
                                 .successHandler(customAuthenticationSuccessHandler)
                                 .permitAll())
+                .oauth2Login(oauth -> oauth
+                        .loginPage("/showLoginPage")
+                        .userInfoEndpoint(userInfo -> userInfo.userService(oauth2UserService))
+                        .successHandler(customAuthenticationSuccessHandler))
                 .logout(logout ->
                         logout
                                 .permitAll()

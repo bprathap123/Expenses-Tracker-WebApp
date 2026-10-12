@@ -5,6 +5,9 @@ import jakarta.persistence.*;
 import java.util.Collection;
 
 @Entity
+@Table(uniqueConstraints = {
+        @UniqueConstraint(name = "uk_user_oauth_identity", columnNames = {"oauth_provider", "oauth_subject"})
+})
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -18,6 +21,12 @@ public class User {
 
     @Column(name = "enabled")
     private boolean enabled;
+
+    @Column(name = "oauth_provider")
+    private String oauthProvider;
+
+    @Column(name = "oauth_subject")
+    private String oauthSubject;
 
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "client_id")
@@ -74,6 +83,22 @@ public class User {
 
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
+    }
+
+    public String getOauthProvider() {
+        return oauthProvider;
+    }
+
+    public void setOauthProvider(String oauthProvider) {
+        this.oauthProvider = oauthProvider;
+    }
+
+    public String getOauthSubject() {
+        return oauthSubject;
+    }
+
+    public void setOauthSubject(String oauthSubject) {
+        this.oauthSubject = oauthSubject;
     }
 
     public Client getClient() {

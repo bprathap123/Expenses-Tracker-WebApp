@@ -76,6 +76,59 @@ Render runs the application from the repository's `Dockerfile`. Render's managed
 
 The existing `sql_script.sql` contains MySQL table definitions. Back up any existing database before applying schema changes. The application creates or updates its tables and initializes the standard role and categories on startup; existing user and expense data is not copied from your local database.
 
+### Enable social sign-in and password reset
+
+The Google and Facebook sign-in buttons are shown only after each provider has been configured. Register a web OAuth client with each provider and add these exact authorized redirect URLs:
+
+```text
+https://expenses-tracker-4lnu.onrender.com/login/oauth2/code/google
+https://expenses-tracker-4lnu.onrender.com/login/oauth2/code/facebook
+```
+
+Add the resulting values in the Render service's **Environment** settings. Do not commit these values or send them in chat:
+
+```text
+GOOGLE_CLIENT_ID=<Google web client ID>
+GOOGLE_CLIENT_SECRET=<Google web client secret>
+FACEBOOK_CLIENT_ID=<Meta app ID>
+FACEBOOK_CLIENT_SECRET=<Meta app secret>
+```
+
+For Facebook, enable the Facebook Login product and add the Facebook callback URL to its valid OAuth redirect URI list. The Facebook app must be live and permitted to serve your users.
+
+For password reset, configure a Gmail account with two-step verification and create a Google **App Password** for this application. In Render set:
+
+```text
+MAIL_HOST=smtp.gmail.com
+MAIL_PORT=587
+MAIL_USERNAME=<your Gmail address>
+MAIL_PASSWORD=<the 16-character Google App Password>
+APP_PUBLIC_BASE_URL=https://expenses-tracker-4lnu.onrender.com
+```
+
+Use the App Password, not your normal Gmail password. Until these values are set, social buttons stay hidden, and password-reset emails cannot be sent. After changing Render environment settings, deploy/restart the service and test using an account with an email address you can access.
+
+### View the hosted data in phpMyAdmin
+
+Production records are in the Aiven MySQL database configured by `DB_URL`, not in the MySQL database local to XAMPP. The data remain in Aiven; phpMyAdmin is only an administration tool and must connect to that same Aiven server to show them.
+
+To use your local XAMPP phpMyAdmin:
+
+1. In Aiven, open the MySQL service's connection information and download its CA certificate.
+2. Copy the certificate into a protected local folder, then configure an additional server in `C:\xampp\phpMyAdmin\config.inc.php` (back up this file first). Use the hostname, port, and database username shown in Aiven; do not use `localhost` or your XAMPP credentials:
+   ```php
+   $i++;
+   $cfg['Servers'][$i]['auth_type'] = 'cookie';
+   $cfg['Servers'][$i]['host'] = '<Aiven MySQL hostname>';
+   $cfg['Servers'][$i]['port'] = '<Aiven MySQL port>';
+   $cfg['Servers'][$i]['connect_type'] = 'tcp';
+   $cfg['Servers'][$i]['ssl'] = true;
+   $cfg['Servers'][$i]['ssl_ca'] = 'C:/path/to/your/aiven-ca.pem';
+   ```
+3. Restart Apache in XAMPP, open phpMyAdmin, choose the Aiven server, and sign in with the Aiven database username and password. Select `defaultdb` to see the production tables.
+
+Keep the Aiven password private. Local XAMPP data and hosted Aiven data are separate databases; importing or copying local records is a separate operation and is not done automatically.
+
 ## ScreenShots
 ![Example Image](screenshots/1.png) <br>
 ![Example Image](screenshots/2-2.png) <br>

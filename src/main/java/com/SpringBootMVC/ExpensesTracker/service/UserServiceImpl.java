@@ -56,7 +56,11 @@ public class UserServiceImpl implements UserService {
         user.setPassword(passwordEncoder.encode(webUser.getPassword()));
         user.setClient(client);
         user.setEnabled(true);
-        user.setRoles(Arrays.asList(roleService.findRoleByName("ROLE_STANDARD")));
+        Role standardRole = roleService.findRoleByName("ROLE_STANDARD");
+        if (standardRole == null) {
+            throw new IllegalStateException("Standard user role has not been initialized");
+        }
+        user.setRoles(Arrays.asList(standardRole));
         userRepository.save(user);
     }
 
