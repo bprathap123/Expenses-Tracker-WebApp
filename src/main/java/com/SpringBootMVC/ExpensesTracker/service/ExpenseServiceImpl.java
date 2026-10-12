@@ -76,25 +76,41 @@ public class ExpenseServiceImpl implements ExpenseService {
     }
 
     @Override
-    public List<Expense> findFilterResult(FilterDTO filter) {
-        String query = "select e from Expense e where";
-        if (!"all".equals(filter.getCategory())) {
-            String category = filter.getCategory();
-            int categoryId = categoryService.findCategoryByName(category).getId();
-            query += String.format(" e.category.id = %d AND", categoryId);
+    public List<Expense> findFilterResult(FilterDTO filter, int clientId) {
+        StringBuilder query = new StringBuilder(
+                "select e from Expense e where e.client.id = :clientId and e.amount between :from and :to"
+        );
+        boolean filterByCategory = filter.getCategory() != null
+                && !"all".equalsIgnoreCase(filter.getCategory());
+        boolean filterByYear = filter.getYear() != null
+                && !"all".equalsIgnoreCase(filter.getYear());
+        boolean filterByMonth = filter.getMonth() != null
+                && !"all".equalsIgnoreCase(filter.getMonth());
+
+        if (filterByCategory) {
+            query.append(" and e.category.name = :category");
         }
-        int from = filter.getFrom();
-        int to = filter.getTo();
-        query += String.format(" e.amount between %d and %d", from, to);
-        if (!"all".equals(filter.getYear())) {
-            query += String.format(" AND CAST(SUBSTRING(e.dateTime, 1, 4) AS INTEGER) = %s", filter.getYear());
+        if (filterByYear) {
+            query.append(" and substring(e.dateTime, 1, 4) = :year");
         }
-        if (!"all".equals(filter.getMonth())) {
-            query += String.format(" AND CAST(SUBSTRING(e.dateTime, 6, 2) AS INTEGER) = %s", filter.getMonth());
+        if (filterByMonth) {
+            query.append(" and substring(e.dateTime, 6, 2) = :month");
         }
-        TypedQuery<Expense> expenseTypedQuery = entityManager.createQuery(query, Expense.class);
-        List<Expense> expenseList = expenseTypedQuery.getResultList();
-        return expenseList;
+
+        TypedQuery<Expense> expenseQuery = entityManager.createQuery(query.toString(), Expense.class)
+                .setParameter("clientId", clientId)
+                .setParameter("from", filter.getFrom())
+                .setParameter("to", filter.getTo());
+        if (filterByCategory) {
+            expenseQuery.setParameter("category", filter.getCategory());
+        }
+        if (filterByYear) {
+            expenseQuery.setParameter("year", filter.getYear());
+        }
+        if (filterByMonth) {
+            expenseQuery.setParameter("month", filter.getMonth());
+        }
+        return expenseQuery.getResultList();
     }
 
 

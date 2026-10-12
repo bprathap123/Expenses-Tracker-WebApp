@@ -9,8 +9,10 @@ import com.SpringBootMVC.ExpensesTracker.service.CategoryService;
 import com.SpringBootMVC.ExpensesTracker.service.ExpenseService;
 import jakarta.servlet.http.HttpSession;
 import java.time.DateTimeException;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -126,10 +128,36 @@ public class MainController {
             return "redirect:/";
         }
 
-        int clientId = client.getId();
+        addExpenseListToModel(model, expenseService.findAllExpensesByClientId(client.getId()), new FilterDTO());
 
-        List<Expense> expenseList = expenseService.findAllExpensesByClientId(clientId);
+        return "list-page";
+    }
 
+    @PostMapping("/processFilter")
+    public String processFilter(
+            @ModelAttribute("filter") FilterDTO filter,
+            Model model,
+            HttpSession session) {
+        Client client = (Client) session.getAttribute("client");
+        if (client == null) {
+            return "redirect:/";
+        }
+
+        if (filter.getFrom() < 0 || filter.getTo() < filter.getFrom()) {
+            addExpenseListToModel(model, List.of(), filter);
+            model.addAttribute("filterError", "Enter a valid amount range.");
+            return "list-page";
+        }
+
+        addExpenseListToModel(
+                model,
+                expenseService.findFilterResult(filter, client.getId()),
+                filter
+        );
+        return "list-page";
+    }
+
+    private void addExpenseListToModel(Model model, List<Expense> expenseList, FilterDTO filter) {
         for (Expense expense : expenseList) {
             if (expense.getCategory() != null) {
                 Category category = categoryService.findCategoryById(expense.getCategory().getId());
@@ -160,9 +188,12 @@ public class MainController {
             }
         }
 
+        List<String> years = new ArrayList<>();
+        for (int year = LocalDate.now().getYear(); year >= 2020; year--) {
+            years.add(Integer.toString(year));
+        }
+        model.addAttribute("years", years);
         model.addAttribute("expenseList", expenseList);
-        model.addAttribute("filter", new FilterDTO());
-
-        return "list-page";
+        model.addAttribute("filter", filter);
     }
 }

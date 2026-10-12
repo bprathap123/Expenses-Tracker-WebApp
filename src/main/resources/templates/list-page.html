@@ -130,11 +130,9 @@
                                     <select id="years" name="years" class="form-control"
                                             style="width: 100%;margin-left:-27px;" th:field="*{year}">
                                         <option value="all">ALL</option>
-                                        <option value="2020">2020</option>
-                                        <option value="2021">2021</option>
-                                        <option value="2022">2022</option>
-                                        <option value="2023">2023</option>
-                                        <option value="2024">2024</option>
+                                        <option th:each="filterYear : ${years}"
+                                                th:value="${filterYear}"
+                                                th:text="${filterYear}"></option>
                                     </select>
                                 </div>
                             </div>
@@ -146,6 +144,7 @@
                 </div>
             </div>
         </div>
+        <div class="alert alert-danger" role="alert" th:if="${filterError}" th:text="${filterError}"></div>
 
         <!-- About Section Content-->
         <!--        <div class="d-flex flex-row">-->

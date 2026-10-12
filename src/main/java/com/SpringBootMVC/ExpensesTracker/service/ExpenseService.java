@@ -13,6 +13,6 @@ public interface ExpenseService {
     List<Expense> findAllExpenses();
     List<Expense> findAllExpensesByClientId(int id);
     void deleteExpenseById(int id);
-    List<Expense> findFilterResult(FilterDTO filter);
+    List<Expense> findFilterResult(FilterDTO filter, int clientId);
 
 }
