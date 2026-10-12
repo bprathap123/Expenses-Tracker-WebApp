@@ -67,14 +67,14 @@ Render runs the application from the repository's `Dockerfile`. Render's managed
 3. In Render, choose **New > Blueprint**, connect the GitHub repository, and deploy the `expenses-tracker` service defined in `render.yaml`.
 4. In the Render service's **Environment** settings, set `DB_URL`, `DB_USERNAME`, and `DB_PASSWORD`. Use the connection details supplied by the database provider:
    ```text
-   DB_URL=jdbc:mysql://<mysql-host>:<mysql-port>/<database-name>?sslMode=REQUIRED
+   DB_URL=jdbc:mysql://mysql-21f11ff1-prathap7780-7d47.f.aivencloud.com:15170/defaultdb?sslMode=REQUIRED
    DB_USERNAME=<mysql-username>
    DB_PASSWORD=<mysql-password>
    ```
-   Use any provider-specific TLS or connection parameters required by your database provider. Never commit production credentials.
+   Copy `DB_USERNAME` and `DB_PASSWORD` from Aiven into Render's private environment settings; never commit or share those production credentials. The application initializes the standard role and expense categories automatically when it starts.
 5. Render supplies the application port at runtime; the Docker entry point uses it automatically. After deployment, open the public Render URL and test registration, login, and expense operations.
 
-The existing `sql_script.sql` contains MySQL table definitions. Back up any existing database before applying schema changes. A new hosted database also needs the application's initial role and category records before registration and expense entry can work.
+The existing `sql_script.sql` contains MySQL table definitions. Back up any existing database before applying schema changes. The application creates or updates its tables and initializes the standard role and categories on startup; existing user and expense data is not copied from your local database.
 
 ## ScreenShots
 ![Example Image](screenshots/1.png) <br>
