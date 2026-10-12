@@ -56,8 +56,8 @@ CREATE TABLE IF NOT EXISTS `expenses_tracker`.`expense` (
   `category_id` INT(11) NULL DEFAULT NULL,
   `client_id` INT(11) NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
-  INDEX `FKmvjm59reb5i075vu38bwcaqj6` (`category_id` ASC) VISIBLE,
-  INDEX `FKq0le09a1upxs1ctbr5mpoltep` (`client_id` ASC) VISIBLE,
+  INDEX `FKmvjm59reb5i075vu38bwcaqj6` (`category_id` ASC),
+  INDEX `FKq0le09a1upxs1ctbr5mpoltep` (`client_id` ASC),
   CONSTRAINT `FKmvjm59reb5i075vu38bwcaqj6`
     FOREIGN KEY (`category_id`)
     REFERENCES `expenses_tracker`.`category` (`id`),
@@ -90,7 +90,7 @@ CREATE TABLE IF NOT EXISTS `expenses_tracker`.`user` (
   `client_id` INT(11) NULL DEFAULT NULL,
   `enabled` BIT(1) NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE INDEX `UK_rb7eox526ilbewv2wuv5bnsrt` (`client_id` ASC) VISIBLE,
+  UNIQUE INDEX `UK_rb7eox526ilbewv2wuv5bnsrt` (`client_id` ASC),
   CONSTRAINT `FKrl8au09hfjd9742b89li2rb3`
     FOREIGN KEY (`client_id`)
     REFERENCES `expenses_tracker`.`client` (`id`))
@@ -105,8 +105,8 @@ DEFAULT CHARACTER SET = latin1;
 CREATE TABLE IF NOT EXISTS `expenses_tracker`.`users_roles` (
   `user_id` INT(11) NOT NULL,
   `role_id` INT(11) NOT NULL,
-  INDEX `FKt4v0rrweyk393bdgt107vdx0x` (`role_id` ASC) VISIBLE,
-  INDEX `FKgd3iendaoyh04b95ykqise6qh` (`user_id` ASC) VISIBLE,
+  INDEX `FKt4v0rrweyk393bdgt107vdx0x` (`role_id` ASC),
+  INDEX `FKgd3iendaoyh04b95ykqise6qh` (`user_id` ASC),
   CONSTRAINT `FKgd3iendaoyh04b95ykqise6qh`
     FOREIGN KEY (`user_id`)
     REFERENCES `expenses_tracker`.`user` (`id`),

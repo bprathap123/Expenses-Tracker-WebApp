@@ -25,21 +25,56 @@ The Expenses Tracker App is a robust financial management solution developed usi
 - **Filtering:** Utilize the filtering feature to efficiently sort and view expenses based on various criteria.
 
 ## Getting Started
+**Prerequisite:** Install Java 21 (LTS) and verify it is available in your terminal:
+```powershell
+java -version
+```
+
 1. **Clone the Repository:**
 `git clone https://github.com/your-username/expenses-tracker.git`
 
-2. **Configure Database:**
-Set up MySQL database and update the application.properties file with your database configuration.
+2. **Configure Local MySQL:**
+Start MySQL through XAMPP or your local MySQL service, then create the database if it does not already exist:
+```sql
+CREATE DATABASE expenses_tracker;
+```
+The local default connection is `localhost:3306/expenses_tracker` as `root`. If your MySQL account uses a password, set it in PowerShell before starting the app (replace the example with your actual local password):
+```powershell
+$env:DB_PASSWORD = "your-local-mysql-password"
+```
+If you use a different MySQL account, set its username as well:
+```powershell
+$env:DB_USERNAME = "your-mysql-username"
+```
+For a local MySQL account with no password, set `$env:DB_PASSWORD = ""`. Credentials are read from environment variables and are not stored in `application.properties`.
 
 3. **Build and Run:**
-Build the project using your preferred IDE or with Maven:
-`mvn clean install`.
+From the project root, start the application with the Maven Wrapper (no separate Maven installation required):
+```powershell
+.\mvnw.cmd spring-boot:run
+```
+Hibernate updates the tables on startup. The database itself must exist before the application connects.
 
-4. **Run the application:**
-`java -jar target/expenses-tracker.jar`.
+4. **Access the App:**
+Open your web browser and navigate to `http://localhost:8081`.
 
-5. **Access the App:**
-Open your web browser and navigate to `http://localhost:8080`.
+## Deploy on Render with Hosted MySQL
+
+Render runs the application from the repository's `Dockerfile`. Render's managed relational database is PostgreSQL, so this MySQL application needs a separately hosted MySQL database. XAMPP on your computer is local and is not an internet-accessible production database.
+
+1. Push the project, including `Dockerfile` and `render.yaml`, to GitHub.
+2. Create a hosted MySQL database with a provider that permits connections from Render. Keep its hostname, port, database name, username, and password private.
+3. In Render, choose **New > Blueprint**, connect the GitHub repository, and deploy the `expenses-tracker` service defined in `render.yaml`.
+4. In the Render service's **Environment** settings, set `DB_URL`, `DB_USERNAME`, and `DB_PASSWORD`. Use the connection details supplied by the database provider:
+   ```text
+   DB_URL=jdbc:mysql://<mysql-host>:<mysql-port>/<database-name>?sslMode=REQUIRED
+   DB_USERNAME=<mysql-username>
+   DB_PASSWORD=<mysql-password>
+   ```
+   Use any provider-specific TLS or connection parameters required by your database provider. Never commit production credentials.
+5. Render supplies the application port at runtime; the Docker entry point uses it automatically. After deployment, open the public Render URL and test registration, login, and expense operations.
+
+The existing `sql_script.sql` contains MySQL table definitions. Back up any existing database before applying schema changes. A new hosted database also needs the application's initial role and category records before registration and expense entry can work.
 
 ## ScreenShots
 ![Example Image](screenshots/1.png) <br>

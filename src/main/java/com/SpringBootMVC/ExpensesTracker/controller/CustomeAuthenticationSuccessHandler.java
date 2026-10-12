@@ -2,7 +2,6 @@ package com.SpringBootMVC.ExpensesTracker.controller;
 
 import com.SpringBootMVC.ExpensesTracker.entity.Client;
 import com.SpringBootMVC.ExpensesTracker.entity.User;
-import com.SpringBootMVC.ExpensesTracker.service.ClientService;
 import com.SpringBootMVC.ExpensesTracker.service.UserService;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -18,12 +17,10 @@ import java.io.IOException;
 @Controller
 public class CustomeAuthenticationSuccessHandler implements AuthenticationSuccessHandler {
     UserService userService;
-    ClientService clientService;
 
     @Autowired
-    public CustomeAuthenticationSuccessHandler(UserService userService, ClientService clientService) {
+    public CustomeAuthenticationSuccessHandler(UserService userService) {
         this.userService = userService;
-        this.clientService = clientService;
     }
 
     @Override
@@ -31,7 +28,10 @@ public class CustomeAuthenticationSuccessHandler implements AuthenticationSucces
             , Authentication authentication) throws IOException, ServletException {
         String username = authentication.getName();
         User user = userService.findUserByUserName(username);
-        Client client = clientService.findClientById(user.getId());
+        if (user == null || user.getClient() == null) {
+            throw new IllegalStateException("Authenticated user has no associated client");
+        }
+        Client client = user.getClient();
         HttpSession session = request.getSession();
         session.setAttribute("client", client);
         response.sendRedirect(request.getContextPath()+"/list");
