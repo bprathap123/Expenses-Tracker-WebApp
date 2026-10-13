@@ -8,14 +8,18 @@ RUN mkdir -p /root/.m2 && \
       '<settings xmlns="http://maven.apache.org/SETTINGS/1.2.0">' \
       '  <mirrors>' \
       '    <mirror>' \
-      '      <id>central-alternate</id>' \
+      '      <id>google-central-mirror</id>' \
       '      <mirrorOf>central</mirrorOf>' \
-      '      <url>https://repo1.maven.org/maven2</url>' \
+      '      <url>https://maven-central.storage-download.googleapis.com/maven2</url>' \
       '    </mirror>' \
       '  </mirrors>' \
       '</settings>' \
-      > /root/.m2/settings.xml && \
-    mvn -B clean package -DskipTests
+      > /root/.m2/settings.xml
+RUN for attempt in 1 2 3 4; do \
+      if mvn -B -U clean package -DskipTests; then exit 0; fi; \
+      if [ "$attempt" -eq 4 ]; then exit 1; fi; \
+      sleep $((attempt * 15)); \
+    done
 
 FROM eclipse-temurin:21-jre
 
