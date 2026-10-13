@@ -46,6 +46,11 @@ public class CustomeAuthenticationSuccessHandler implements AuthenticationSucces
         }
         HttpSession session = request.getSession();
         session.setAttribute("client", client);
-        response.sendRedirect(request.getContextPath()+"/list");
+        if (request.getHeader("Accept") != null
+                && request.getHeader("Accept").contains("application/json")) {
+            response.setStatus(HttpServletResponse.SC_NO_CONTENT);
+        } else {
+            response.sendRedirect(request.getContextPath() + "/list");
+        }
     }
 }

@@ -13,6 +13,8 @@ services:
         sync: false
       - key: DB_PASSWORD
         sync: false
+      - key: SESSION_COOKIE_SECURE
+        value: "true"
       - key: APP_PUBLIC_BASE_URL
         value: https://expenses-tracker-4lnu.onrender.com
       - key: MAIL_HOST

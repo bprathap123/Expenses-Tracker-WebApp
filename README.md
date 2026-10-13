@@ -76,13 +76,27 @@ Render runs the application from the repository's `Dockerfile`. Render's managed
 
 The existing `sql_script.sql` contains MySQL table definitions. Back up any existing database before applying schema changes. The application creates or updates its tables and initializes the standard role and categories on startup; existing user and expense data is not copied from your local database.
 
+### Deploy the separate frontend to Vercel
+
+The Vercel frontend is a static application in `frontend/`. It calls the Spring API through Vercel rewrites, so the browser uses one origin for the UI and session cookie while Render continues to run the Java application and Aiven continues to store the data. phpMyAdmin is only a database administration tool; it does not host the Java backend.
+
+1. Deploy the Spring application on Render and configure its database credentials as described above. The free Render service may sleep when idle; opening the Vercel URL can take time while Render wakes up.
+2. In Vercel, import this GitHub repository and set the **Root Directory** to `frontend`. Use the detected static-site settings (no build command; output directory `.`).
+3. After Vercel provides the production URL, set Render's `APP_PUBLIC_BASE_URL` to that exact HTTPS origin (for example `https://your-project.vercel.app`) and redeploy the Render service. Keep `SESSION_COOKIE_SECURE=true` for production.
+4. If Google or Facebook sign-in is enabled, add the Vercel callback URLs to each provider's allowed redirect URI list:
+   `https://your-project.vercel.app/login/oauth2/code/google` and/or `https://your-project.vercel.app/login/oauth2/code/facebook`.
+   The Vercel rewrites forward these auth requests to Render. Update the provider's existing Render callback URL rather than sharing any OAuth secrets.
+5. Test registration, sign-in, expense create/edit/delete, filtering, sign-out, and any configured OAuth or password-reset flows from the Vercel URL.
+
+The Vercel rewrite target currently points to `https://expenses-tracker-4lnu.onrender.com`; change `frontend/vercel.json` if the Render service URL changes. Deploying only the frontend does not prevent the free Render backend from sleeping.
+
 ### Enable social sign-in and password reset
 
-The Google and Facebook sign-in buttons are shown only after each provider has been configured. Register a web OAuth client with each provider and add these exact authorized redirect URLs:
+The Google and Facebook sign-in buttons are shown only after each provider has been configured. For a Vercel frontend, register a web OAuth client with each provider and allow the callback URLs on the Vercel production domain:
 
 ```text
-https://expenses-tracker-4lnu.onrender.com/login/oauth2/code/google
-https://expenses-tracker-4lnu.onrender.com/login/oauth2/code/facebook
+https://your-project.vercel.app/login/oauth2/code/google
+https://your-project.vercel.app/login/oauth2/code/facebook
 ```
 
 Add the resulting values in the Render service's **Environment** settings. Do not commit these values or send them in chat:
@@ -103,10 +117,10 @@ MAIL_HOST=smtp.gmail.com
 MAIL_PORT=587
 MAIL_USERNAME=<your Gmail address>
 MAIL_PASSWORD=<the 16-character Google App Password>
-APP_PUBLIC_BASE_URL=https://expenses-tracker-4lnu.onrender.com
+APP_PUBLIC_BASE_URL=https://your-project.vercel.app
 ```
 
-Use the App Password, not your normal Gmail password. Until these values are set, social buttons stay hidden, and password-reset emails cannot be sent. After changing Render environment settings, deploy/restart the service and test using an account with an email address you can access.
+Use the App Password, not your normal Gmail password. Until these values are set, social buttons stay hidden, and password-reset emails cannot be sent. If you access the app directly on Render without Vercel, use the Render callback URLs and Render base URL instead. After changing Render environment settings, deploy/restart the service and test using an account with an email address you can access.
 
 ### View the hosted data in phpMyAdmin
 

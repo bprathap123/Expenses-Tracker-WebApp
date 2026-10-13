@@ -1,0 +1,56 @@
+{
+  "rewrites": [
+    {
+      "source": "/api/:path*",
+      "destination": "https://expenses-tracker-4lnu.onrender.com/api/:path*"
+    },
+    {
+      "source": "/authenticateTheUser",
+      "destination": "https://expenses-tracker-4lnu.onrender.com/authenticateTheUser"
+    },
+    {
+      "source": "/logout",
+      "destination": "https://expenses-tracker-4lnu.onrender.com/logout"
+    },
+    {
+      "source": "/oauth2/:path*",
+      "destination": "https://expenses-tracker-4lnu.onrender.com/oauth2/:path*"
+    },
+    {
+      "source": "/login/oauth2/:path*",
+      "destination": "https://expenses-tracker-4lnu.onrender.com/login/oauth2/:path*"
+    },
+    {
+      "source": "/forgot-password",
+      "destination": "https://expenses-tracker-4lnu.onrender.com/forgot-password"
+    },
+    {
+      "source": "/password-reset",
+      "destination": "https://expenses-tracker-4lnu.onrender.com/password-reset"
+    },
+    {
+      "source": "/reset-password",
+      "destination": "https://expenses-tracker-4lnu.onrender.com/reset-password"
+    },
+    {
+      "source": "/showLoginPage",
+      "destination": "https://expenses-tracker-4lnu.onrender.com/showLoginPage"
+    },
+    {
+      "source": "/css/:path*",
+      "destination": "https://expenses-tracker-4lnu.onrender.com/css/:path*"
+    },
+    {
+      "source": "/js/:path*",
+      "destination": "https://expenses-tracker-4lnu.onrender.com/js/:path*"
+    },
+    {
+      "source": "/assets/:path*",
+      "destination": "https://expenses-tracker-4lnu.onrender.com/assets/:path*"
+    },
+    {
+      "source": "/:path*",
+      "destination": "/index.html"
+    }
+  ]
+}
